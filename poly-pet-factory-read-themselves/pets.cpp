@@ -17,7 +17,8 @@
 
 using namespace std;
 
-string readNextItem(istream &io, char delimiter = ',') {
+string readNextItem(istream &io, char delimiter = ',')
+{
   const char space = ' ';
   string str;
   getline(io, str, delimiter);
@@ -29,7 +30,8 @@ string readNextItem(istream &io, char delimiter = ',') {
 }
 
 // read to end of line, returning string for debugging
-const string discardLine(istream &is) {
+const string discardLine(istream &is)
+{
   string discard;
   getline(is, discard);
   return discard;
@@ -39,12 +41,15 @@ const string discardLine(istream &is) {
  * The abstract class at the top of the hierarchy
  * All Pets are derived from this class
  **/
-class Pet {
+class Pet
+{
   friend ostream &operator<<(ostream &os, const Pet &p) { return p.printer(os); }
- protected:
+
+protected:
   string name, units;
   int age, weight;
- public:
+
+public:
   virtual Pet *create() = 0;
   virtual bool read(istream &is) = 0;
   virtual void say() = 0;
@@ -57,22 +62,27 @@ class Pet {
 /**
  * Cat class, Cat is a Pet
  */
-class Cat : public Pet {
- private:
+class Cat : public Pet
+{
+private:
   string type;
- public:
+
+public:
   Pet *create() override { return new Cat(); }
   // cats are: C FirstName LastName, Age Type, Weight WeightUnits
-  bool read(istream &is) override {
-    name = readNextItem(is);  // default delimiter is comma
+  bool read(istream &is) override
+  {
+    name = readNextItem(is); // default delimiter is comma
     is >> age;
     type = readNextItem(is);
     is >> weight >> units;
     return true;
   }
   void say() override { cout << "Meeow" << endl; }
-  ostream &printer(ostream &os) const override {
-    os << "Cat: " << "name: " << name
+  ostream &printer(ostream &os) const override
+  {
+    os << "Cat: "
+       << "name: " << name
        << ", age: " << age << ", type: " << type
        << ", weight: " << weight << ", wu: " << units;
     return os;
@@ -82,13 +92,16 @@ class Cat : public Pet {
 /**
  * Dog class, Dog is a Pet
  */
-class Dog : public Pet {
- private:
+class Dog : public Pet
+{
+private:
   string color;
- public:
+
+public:
   Pet *create() override { return new Dog(); }
   // dogs are: D Name Age, Color, Weight, WeightUnits
-  bool read(istream &is) override {
+  bool read(istream &is) override
+  {
     is >> name >> age;
     char discard_comma;
     is >> discard_comma;
@@ -97,8 +110,72 @@ class Dog : public Pet {
     return true;
   }
   void say() override { cout << "Woof" << endl; }
-  ostream &printer(ostream &os) const override {
-    os << "Dog: " << "name: " << name
+  ostream &printer(ostream &os) const override
+  {
+    os << "Dog: "
+       << "name: " << name
+       << ", age: " << age << ", color: " << color
+       << ", weight: " << weight << ", wu: " << units;
+    return os;
+  }
+};
+
+/**
+ * Horse class, Horse is a Pet
+ */
+class Horse : public Pet
+{
+private:
+  string color;
+
+public:
+  Pet *create() override { return new Horse(); }
+  // turtle are: D Name Age, Color, Weight, WeightUnits
+  bool read(istream &is) override
+  {
+    is >> name >> age;
+    char discard_comma;
+    is >> discard_comma;
+    color = readNextItem(is);
+    is >> weight >> discard_comma >> units;
+    return true;
+  }
+  void say() override { cout << "Neighhhh" << endl; }
+  ostream &printer(ostream &os) const override
+  {
+    os << "Horse: "
+       << "name: " << name
+       << ", age: " << age << ", color: " << color
+       << ", weight: " << weight << ", wu: " << units;
+    return os;
+  }
+};
+
+/**
+ * Turtle class, Turtle is a Pet
+ */
+class Turtle : public Pet
+{
+private:
+  string color;
+
+public:
+  Pet *create() override { return new Turtle(); }
+  // turtle are: D Name Age, Color, Weight, WeightUnits
+  bool read(istream &is) override
+  {
+    is >> name >> age;
+    char discard_comma;
+    is >> discard_comma;
+    color = readNextItem(is);
+    is >> weight >> discard_comma >> units;
+    return true;
+  }
+  void say() override { cout << "uahhhHHHHHHH" << endl; }
+  ostream &printer(ostream &os) const override
+  {
+    os << "Turtle: "
+       << "name: " << name
        << ", age: " << age << ", color: " << color
        << ", weight: " << weight << ", wu: " << units;
     return os;
@@ -106,23 +183,35 @@ class Dog : public Pet {
 };
 
 // PetFactory, each subclass of Pet needs its own concrete version
-class PetFactory {
- private:
+class PetFactory
+{
+private:
   static const int factory_size = 'Z' - 'A' + 1;
   Pet *pets[factory_size];
-  int getBucket(char petType) const {
+  int getBucket(char petType) const
+  {
     assert(petType >= 'A' && petType <= 'Z');
     return petType - 'A';
   }
- public:
-  PetFactory() {
-    for (auto &p : pets) p = nullptr;
+
+public:
+  PetFactory()
+  {
+    for (auto &p : pets)
+      p = nullptr;
     pets[getBucket('C')] = new Cat();
     pets[getBucket('D')] = new Dog();
+    pets[getBucket('T')] = new Turtle();
+    pets[getBucket('H')] = new Horse();
   }
-  ~PetFactory() { for (const auto &p : pets) delete p; }
+  ~PetFactory()
+  {
+    for (const auto &p : pets)
+      delete p;
+  }
 
-  Pet *create(char petType) {
+  Pet *create(char petType)
+  {
     if (pets[getBucket(petType)])
       return pets[getBucket(petType)]->create();
     else
@@ -130,44 +219,62 @@ class PetFactory {
   }
 };
 
-class PetStore {
- private:
+class PetStore
+{
+private:
   PetFactory factory;
   vector<Pet *> pets;
- public:
+
+public:
   PetStore() = default;
-  ~PetStore() { for (const auto &p : pets) delete p; }
-  void readPetsFromFile(const string &filename) {
+  ~PetStore()
+  {
+    for (const auto &p : pets)
+      delete p;
+  }
+  void readPetsFromFile(const string &filename)
+  {
     ifstream fs(filename);
-    if (!fs.is_open()) {
+    if (!fs.is_open())
+    {
       cerr << "Could not open file: " << filename << endl;
     }
     char petType;
-    while (fs >> petType) {
+    while (fs >> petType)
+    {
       Pet *pet = factory.create(petType);
-      if (pet) {
-        if (pet->read(fs)) {
+      if (pet)
+      {
+        if (pet->read(fs))
+        {
           pets.push_back(pet);
-        } else {
+        }
+        else
+        {
           delete pet;
         }
-      } else {
+      }
+      else
+      {
         cout << "Unrecognized pet type: " << petType << endl;
         cout << "Discarding line: " << discardLine(fs) << endl;
       }
     }
     fs.close();
   }
-  void processPets(const string &filename) {
+  void processPets(const string &filename)
+  {
     readPetsFromFile(filename);
-    for (const auto &p : pets) {
+    for (const auto &p : pets)
+    {
       cout << *p << " says ---> ";
       p->say();
     }
   }
 };
 
-int main() {
+int main()
+{
   PetStore store;
   store.processPets("pets0.txt");
   return 0;
