@@ -3,36 +3,50 @@
 
 using namespace std;
 
-class Pet {
- public:
+class Pet
+{
+public:
   virtual void say() = 0;
   virtual ~Pet() = default;
 };
 
 // Cat class, Cat isa Pet
-class Cat : public Pet {
- public:
+class Cat : public Pet
+{
+public:
   void say() override { cout << "Meeow" << endl; }
 };
 
 // Dog class, Cat isa Pet
-class Dog : public Pet {
- public:
+class Dog : public Pet
+{
+public:
   void say() override { cout << "Woof" << endl; }
 };
 
+class Turtle : public Pet
+{
+public:
+  void say() override { cout << "uahhhHHHHHHH" << endl; }
+};
+
 // PetFactory is the only one that knows about different Pets
-class PetFactory {
- public:
-  static Pet *create(const string &type) {
+class PetFactory
+{
+public:
+  static Pet *create(const string &type)
+  {
     if (type == "Cat")
       return new Cat();
-    else
+    else if (type == "Dog")
       return new Dog();
+    else
+      return new Turtle();
   }
 };
 
-int main() {
+int main()
+{
   Pet *p1 = PetFactory::create("Cat");
   Pet *p2 = PetFactory::create("Dog");
   p1->say();
