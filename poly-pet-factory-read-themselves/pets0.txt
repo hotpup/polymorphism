@@ -1,5 +1,5 @@
 C Lazy Hunter, 8 American orange, 16 lbs
-C Mr Fluffy, 2 Persian black, 12 lbs
+H Mr Fluffy, 2 Persian black, 12 lbs
 D Sweet 4, white, 16, lbs
 T Silly Speedy, 6 Unknown, brown, 4 lbs
 X cats are: C FirstName LastName, Age Type, Weight WeightUnits
